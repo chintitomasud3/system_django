@@ -1,0 +1,59 @@
+<div id="task-form-container">
+    <!-- Modal Header -->
+    <div class="px-6 py-4 border-b border-slate-800/80 bg-slate-950/20 flex items-center justify-between">
+        <h3 class="text-lg font-outfit font-bold text-slate-100 flex items-center gap-2">
+            <i class="fa-solid fa-square-poll-horizontal text-indigo-500"></i>
+            {{ title }}
+        </h3>
+        <button @click="$dispatch('close-modal')" 
+                class="text-slate-500 hover:text-slate-300 transition p-1 cursor-pointer">
+            <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+    </div>
+
+    <!-- Modal Body & Form -->
+    <form hx-post="{{ action_url }}" 
+          hx-target="#task-form-container"
+          hx-swap="outerHTML"
+          class="m-0">
+        {% csrf_token %}
+        <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+            {% for field in form %}
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-rose-500">*</span>{% endif %}
+                    </label>
+                    <div>
+                        {{ field }}
+                    </div>
+                    {% if field.help_text %}
+                        <p class="text-[10px] text-slate-500 leading-relaxed">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="mt-1 flex items-center gap-1.5 text-xs text-rose-400">
+                            <i class="fa-solid fa-circle-exclamation text-[10px]"></i>
+                            <span>{{ field.errors.0 }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Modal Footer Actions -->
+        <div class="px-6 py-4 border-t border-slate-800/80 bg-slate-950/20 flex items-center justify-end gap-3">
+            <!-- Cancel button -->
+            <button type="button" 
+                    @click="$dispatch('close-modal')" 
+                    class="px-4 py-2 text-sm font-semibold text-slate-400 hover:text-slate-200 transition rounded-xl cursor-pointer">
+                Cancel
+            </button>
+            <!-- Save button -->
+            <button type="submit" 
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-md hover:shadow-indigo-500/20 transition cursor-pointer">
+                <i class="fa-solid fa-floppy-disk text-xs"></i>
+                Save Changes
+            </button>
+        </div>
+    </form>
+</div>

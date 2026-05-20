@@ -1,0 +1,112 @@
+<div class="bg-slate-900 border border-slate-900 hover:border-slate-800 rounded-2xl p-4 shadow-md hover:shadow-lg transition duration-200 group flex flex-col justify-between gap-3">
+    <!-- Top Row: Priority Badge & Actions -->
+    <div class="flex items-center justify-between gap-2">
+        <!-- Priority Badges -->
+        <div>
+            {% if task.priority == 'high' %}
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                    <span class="h-1 w-1 rounded-full bg-rose-400"></span> High
+                </span>
+            {% elif task.priority == 'medium' %}
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    <span class="h-1 w-1 rounded-full bg-blue-400"></span> Medium
+                </span>
+            {% else %}
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/10 text-slate-400 border border-slate-500/20">
+                    <span class="h-1 w-1 rounded-full bg-slate-400"></span> Low
+                </span>
+            {% endif %}
+        </div>
+
+        <!-- Task Card CRUD Options (hidden, shown on card hover) -->
+        <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition duration-150">
+            <!-- Edit -->
+            <button hx-get="{% url 'tasks:edit' task.pk %}" 
+                    hx-target="#modal-content" 
+                    @click="$dispatch('open-modal')"
+                    class="h-6 w-6 rounded bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 flex items-center justify-center transition cursor-pointer"
+                    title="Edit Task">
+                <i class="fa-solid fa-pen text-[10px]"></i>
+            </button>
+            <!-- Delete -->
+            <button hx-get="{% url 'tasks:delete' task.pk %}" 
+                    hx-target="#modal-content" 
+                    @click="$dispatch('open-modal')"
+                    class="h-6 w-6 rounded bg-slate-800 hover:bg-slate-700 text-rose-400 hover:text-rose-400 flex items-center justify-center transition cursor-pointer"
+                    title="Delete Task">
+                <i class="fa-solid fa-trash-can text-[10px]"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Title & Description -->
+    <div>
+        <h4 hx-get="{% url 'tasks:detail' task.pk %}" 
+            hx-target="#modal-content" 
+            @click="$dispatch('open-modal')"
+            class="font-semibold text-slate-100 hover:text-indigo-400 transition leading-snug cursor-pointer">
+            {{ task.title }}
+        </h4>
+        {% if task.description %}
+            <p class="text-xs text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">
+                {{ task.description }}
+            </p>
+        {% endif %}
+    </div>
+
+    <!-- Footer Area: Date & Quick Status Navigation -->
+    <div class="flex items-center justify-between border-t border-slate-800/40 pt-3 mt-1 gap-2">
+        <!-- Due Date -->
+        <div>
+            {% if task.due_date %}
+                <span class="inline-flex items-center text-[10px] text-slate-400">
+                    <i class="fa-regular fa-calendar mr-1.5 text-slate-500"></i>
+                    {{ task.due_date|date:"M d, Y" }}
+                </span>
+            {% else %}
+                <span class="text-[10px] text-slate-600">No due date</span>
+            {% endif %}
+        </div>
+
+        <!-- Quick Status Shifters (HTMX) -->
+        <div class="flex items-center gap-1">
+            {% if task.status == 'todo' %}
+                <!-- Move right to In Progress -->
+                <form hx-post="{% url 'tasks:update_status' task.pk %}" hx-trigger="submit" class="m-0">
+                    <input type="hidden" name="status" value="in_progress">
+                    <button type="submit" 
+                            class="h-6 px-2 text-[10px] bg-slate-850 hover:bg-slate-800 text-slate-400 hover:text-indigo-400 rounded-lg border border-slate-800/80 transition flex items-center gap-1 cursor-pointer">
+                        Start <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            {% elif task.status == 'in_progress' %}
+                <!-- Move left to Todo -->
+                <form hx-post="{% url 'tasks:update_status' task.pk %}" hx-trigger="submit" class="m-0">
+                    <input type="hidden" name="status" value="todo">
+                    <button type="submit" 
+                            class="h-6 w-6 bg-slate-850 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg border border-slate-800/80 transition flex items-center justify-center cursor-pointer"
+                            title="Move back to To Do">
+                        <i class="fa-solid fa-arrow-left text-[9px]"></i>
+                    </button>
+                </form>
+                <!-- Move right to Completed -->
+                <form hx-post="{% url 'tasks:update_status' task.pk %}" hx-trigger="submit" class="m-0">
+                    <input type="hidden" name="status" value="completed">
+                    <button type="submit" 
+                            class="h-6 px-2 text-[10px] bg-slate-850 hover:bg-slate-800 text-slate-400 hover:text-emerald-400 rounded-lg border border-slate-800/80 transition flex items-center gap-1 cursor-pointer">
+                        Complete <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            {% elif task.status == 'completed' %}
+                <!-- Move left to In Progress -->
+                <form hx-post="{% url 'tasks:update_status' task.pk %}" hx-trigger="submit" class="m-0">
+                    <input type="hidden" name="status" value="in_progress">
+                    <button type="submit" 
+                            class="h-6 px-2 text-[10px] bg-slate-850 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg border border-slate-800/80 transition flex items-center gap-1 cursor-pointer">
+                        <i class="fa-solid fa-arrow-left"></i> Reopen
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
