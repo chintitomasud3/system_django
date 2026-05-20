@@ -1,0 +1,198 @@
+{% extends "system_info/base.html" %}
+
+{% block content %}
+<div class="space-y-8">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-outfit font-bold text-white">System Information</h1>
+            <p class="text-slate-400 mt-1">Real-time system monitoring and diagnostics</p>
+        </div>
+        <button onclick="location.reload()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition flex items-center gap-2">
+            <i class="fa-solid fa-arrows-rotate"></i>
+            Refresh
+        </button>
+    </div>
+
+    <!-- System Overview -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="h-10 w-10 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+                    <i class="fa-solid fa-server"></i>
+                </div>
+                <div>
+                    <p class="text-slate-400 text-xs">OS</p>
+                    <p class="font-semibold text-white">{{ system_info.system }}</p>
+                </div>
+            </div>
+            <p class="text-slate-500 text-xs">{{ system_info.release }}</p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="h-10 w-10 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                    <i class="fa-solid fa-microchip"></i>
+                </div>
+                <div>
+                    <p class="text-slate-400 text-xs">CPU Cores</p>
+                    <p class="font-semibold text-white">{{ stats.cpu.count }}</p>
+                </div>
+            </div>
+            <p class="text-slate-500 text-xs">{{ stats.cpu.max_freq }} MHz max</p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="h-10 w-10 rounded-lg bg-violet-500/10 text-violet-400 flex items-center justify-center">
+                    <i class="fa-solid fa-memory"></i>
+                </div>
+                <div>
+                    <p class="text-slate-400 text-xs">Total RAM</p>
+                    <p class="font-semibold text-white">{{ stats.memory.total }} GB</p>
+                </div>
+            </div>
+            <p class="text-slate-500 text-xs">{{ stats.memory.available }} GB available</p>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-5">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="h-10 w-10 rounded-lg bg-orange-500/10 text-orange-400 flex items-center justify-center">
+                    <i class="fa-solid fa-hard-drive"></i>
+                </div>
+                <div>
+                    <p class="text-slate-400 text-xs">Disk Total</p>
+                    <p class="font-semibold text-white">{{ stats.disk.total }} GB</p>
+                </div>
+            </div>
+            <p class="text-slate-500 text-xs">{{ stats.disk.free }} GB free</p>
+        </div>
+    </div>
+
+    <!-- CPU Usage -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-microchip text-indigo-400"></i>
+            CPU Usage
+        </h2>
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-slate-300">Current Usage</span>
+                <span class="text-white font-semibold">{{ stats.cpu.percent }}%</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-3">
+                <div class="bg-indigo-500 h-3 rounded-full transition-all duration-500" style="width: {{ stats.cpu.percent }}%"></div>
+            </div>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                    <p class="text-slate-400">Current Frequency</p>
+                    <p class="text-white font-medium">{{ stats.cpu.current_freq }} MHz</p>
+                </div>
+                <div>
+                    <p class="text-slate-400">Max Frequency</p>
+                    <p class="text-white font-medium">{{ stats.cpu.max_freq }} MHz</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Memory & Swap -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-memory text-violet-400"></i>
+                Memory (RAM)
+            </h2>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-300">Used</span>
+                    <span class="text-white font-semibold">{{ stats.memory.used }} GB / {{ stats.memory.total }} GB</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-3">
+                    <div class="bg-violet-500 h-3 rounded-full transition-all duration-500" style="width: {{ stats.memory.percent }}%"></div>
+                </div>
+                <p class="text-slate-400 text-sm">{{ stats.memory.percent }}% used</p>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-file-zipper text-amber-400"></i>
+                Swap Memory
+            </h2>
+            <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-300">Used</span>
+                    <span class="text-white font-semibold">{{ stats.swap.used }} GB / {{ stats.swap.total }} GB</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-3">
+                    <div class="bg-amber-500 h-3 rounded-full transition-all duration-500" style="width: {{ stats.swap.percent }}%"></div>
+                </div>
+                <p class="text-slate-400 text-sm">{{ stats.swap.percent }}% used</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Disk Usage -->
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+        <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <i class="fa-solid fa-hard-drive text-orange-400"></i>
+            Disk Usage
+        </h2>
+        <div class="space-y-3">
+            <div class="flex items-center justify-between">
+                <span class="text-slate-300">Used</span>
+                <span class="text-white font-semibold">{{ stats.disk.used }} GB / {{ stats.disk.total }} GB</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-3">
+                <div class="bg-orange-500 h-3 rounded-full transition-all duration-500" style="width: {{ stats.disk.percent }}%"></div>
+            </div>
+            <p class="text-slate-400 text-sm">{{ stats.disk.percent }}% used</p>
+        </div>
+    </div>
+
+    <!-- Network & System Info -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-network-wired text-cyan-400"></i>
+                Network Activity
+            </h2>
+            <div class="space-y-2">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Bytes Sent</span>
+                    <span class="text-white font-medium">{{ stats.network.bytes_sent }} MB</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Bytes Received</span>
+                    <span class="text-white font-medium">{{ stats.network.bytes_recv }} MB</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-circle-info text-blue-400"></i>
+                System Details
+            </h2>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Hostname</span>
+                    <span class="text-white">{{ system_info.node }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Machine</span>
+                    <span class="text-white">{{ system_info.machine }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Processor</span>
+                    <span class="text-white truncate max-w-[200px]" title="{{ system_info.processor }}">{{ system_info.processor|default:"N/A" }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Boot Time</span>
+                    <span class="text-white">{{ stats.boot_time }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
